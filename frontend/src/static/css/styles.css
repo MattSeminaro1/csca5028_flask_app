@@ -1,0 +1,26 @@
+/* styles.css */
+
+body {
+    background-color: #f0f8ff; /* Light blue */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Horizontal centering */
+    height: 100vh; /* Set height to full viewport height */
+}
+
+h1 {
+    color: #006400; /* Dark green */
+}
+
+.button {
+    background-color: #ffd700; /* Gold */
+    border: none;
+    color: black;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+}
