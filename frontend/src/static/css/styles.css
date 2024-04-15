@@ -24,3 +24,20 @@ h1 {
     cursor: pointer;
     border-radius: 8px;
 }
+
+/* Table styles */
+table {
+    border-collapse: collapse;
+    width: 80%; /* Adjust width as needed */
+    margin-top: 20px; /* Add space between h1 and table */
+}
+
+th, td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+th {
+    background-color: #f2f2f2;
+}

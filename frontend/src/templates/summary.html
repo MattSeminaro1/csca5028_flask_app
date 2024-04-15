@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ player }} Summary Statistics For Last {{ num_games }} Games </title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>{{ player }} Summary Statistics For Last {{ num_games }} Games</h1>
+    <table>
+        <tr>
+            <th>Variable</th>
+            <th>Minimum</th>
+            <th>Average</th>
+            <th>Median</th>
+            <th>Maximum</th>
+        </tr>
+        {% for stat in summary_statistics %}
+            <tr>
+                <td>{{ stat[0] }}</td>
+                <td>{{ stat[1] }}</td>
+                <td>{{ stat[2] }}</td>
+                <td>{{ stat[3] }}</td>
+                <td>{{ stat[4] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

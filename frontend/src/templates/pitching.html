@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pitching Data</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>Pitching Data</h1>
+    <form action="/pitching" method="post">
+        <label for="pitcher">Select Pitcher:</label>
+        <select name="pitcher" id="pitcher">
+            {% for pitcher in pitchers %}
+                <option value="{{ pitcher }}">{{ pitcher }}</option>
+            {% endfor %}
+        </select>
+        <br><br> <!-- Add line breaks -->
+        <label for="num_games">Number of Games:</label>
+        <input type="number" name="num_games" id="num_games" min="1">
+        <br><br> <!-- Add line breaks -->
+        <button class="button" type="submit">Get Summary Statistics</button>
+    </form>
+</body>
+</html>
