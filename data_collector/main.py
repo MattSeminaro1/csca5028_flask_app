@@ -1,9 +1,11 @@
+#!/usr/bin/env python3
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from datetime import datetime, timedelta
 import pandas as pd
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 import time
 import psycopg2
@@ -14,7 +16,7 @@ from psycopg2 import sql
 current_date = datetime.now()
 
 # Subtract one day from the current date
-previous_date = current_date - timedelta(days=1)
+previous_date = current_date - timedelta(days=12)
 
 # Extract year, month, and day from the previous date
 year = previous_date.year
@@ -48,7 +50,9 @@ print('done')
 def get_stat_data(link_list, type):
     soup_list = []
     for i in link_list:
-        driver = webdriver.Chrome()
+        chrome_options = Options()
+        chrome_options.add_argument('--headless')
+        driver = webdriver.Chrome(options=chrome_options)
         driver.get(i)
         time.sleep(5)
 
