@@ -51,8 +51,11 @@ def get_stat_data(link_list, type):
     soup_list = []
     for i in link_list:
         chrome_options = Options()
+	chrome_options.binary_location = GOOGLE_CHROME_BIN
         chrome_options.add_argument('--headless')
-        driver = webdriver.Chrome(options=chrome_options)
+        chrome_options.add_argument('--disable-gpu')
+	chrome_options.add_argument('--no-sandbox')
+	driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
         driver.get(i)
         time.sleep(5)
 
