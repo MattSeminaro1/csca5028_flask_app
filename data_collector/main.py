@@ -16,7 +16,7 @@ from psycopg2 import sql
 current_date = datetime.now()
 
 # Subtract one day from the current date
-previous_date = current_date - timedelta(days=12)
+previous_date = current_date - timedelta(days=15)
 
 # Extract year, month, and day from the previous date
 year = previous_date.year
@@ -51,11 +51,8 @@ def get_stat_data(link_list, type):
     soup_list = []
     for i in link_list:
         chrome_options = Options()
-        chrome_options.binary_location = GOOGLE_CHROME_BIN
         chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--disable-gpu')
-        chrome_options.add_argument('--no-sandbox')
-        driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
+        driver = webdriver.Chrome(options=chrome_options)
         driver.get(i)
         time.sleep(5)
 
