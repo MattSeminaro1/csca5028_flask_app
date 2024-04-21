@@ -10,19 +10,6 @@ from selenium.webdriver.common.by import By
 import time
 import psycopg2
 from psycopg2 import sql
-import os
-
-
-# Get the current date
-current_date = datetime.now()
-
-# Subtract one day from the current date
-previous_date = current_date - timedelta(days=1)
-
-# Extract year, month, and day from the previous date
-year = previous_date.year
-month = previous_date.month
-day = previous_date.day
 def find_endpoints(url):
     response = requests.get(url)
     if response.status_code == 200:
@@ -33,20 +20,6 @@ def find_endpoints(url):
     else:
         print("Failed to retrieve data")
         return None
-# URL of the page containing the box scores
-url = f"https://www.baseball-reference.com/boxes/?year={year}&month={month}&day={day}"
-# Find endpoints
-endpoints = find_endpoints(url)
-if endpoints:
-    print("List of endpoints:")
-    for endpoint in endpoints:
-        print(endpoint)
-else:
-    print("No endpoints found.")
-
-print('done')
-
-
 ###Need to edit this function
 def get_stat_data(link_list, type):
     soup_list = []
@@ -87,10 +60,6 @@ def get_stat_data(link_list, type):
             soup_list.append(csv)
         print('done')
     return soup_list
-raw_batting_data = get_stat_data(endpoints, 'batting')
-raw_pitching_data = get_stat_data(endpoints, 'pitching')
-print('done')
-
 
 def clean_csv(csv, type):
     no_blank = []
@@ -118,54 +87,83 @@ def clean_csv(csv, type):
     season_data['cWPA'] = season_data['cWPA'].str.replace('%', '')
     return season_data
 
-pitching_data_csv = clean_csv(raw_pitching_data, 'pitching')
-pitching_data_csv['upload_dttm'] = previous_date
-batting_data_csv = clean_csv(raw_batting_data, 'batting')
-batting_data_csv['upload_dttm'] = previous_date
-pitching_data_csv.rename(columns={col: col.lower() for col in pitching_data_csv.columns}, inplace=True)
-batting_data_csv.rename(columns={col: col.lower() for col in  batting_data_csv.columns}, inplace=True)
-batting_data_csv.rename(columns={'wpa+': 'wpaplus', 'wpa-': 'wpaminus'}, inplace=True)
+def main():
+    # Get the current date
+    current_date = datetime.now()
 
+    # Subtract one day from the current date
+    previous_date = current_date - timedelta(days=2)
 
-##insert data
-conn_params = {
-    'dbname': 'db_init',
-    'user': 'csca5028',
-    'password': 'csca5028',
-    'host': 'csca5028-db-instance.c1a04q2cyd4h.us-east-1.rds.amazonaws.com',
-    'port': '5432'
-}
+    # Extract year, month, and day from the previous date
+    year = previous_date.year
+    month = previous_date.month
+    day = previous_date.day
 
-conn = psycopg2.connect(**conn_params)
-cur = conn.cursor()
+    url = f"https://www.baseball-reference.com/boxes/?year={year}&month={month}&day={day}"
+    # Find endpoints
+    endpoints = find_endpoints(url)
+    if endpoints:
+        print("List of endpoints:")
+        for endpoint in endpoints:
+            print(endpoint)
+    else:
+        print("No endpoints found.")
 
-# Insert for Pitching Data
-table_name = 'pitching_data'
-columns = pitching_data_csv.columns.tolist()
-insert_statement = sql.SQL("INSERT INTO {} ({}) VALUES ({});").format(
-    sql.Identifier(table_name),
-    sql.SQL(', ').join(map(sql.Identifier, columns)),
-    sql.SQL(', ').join(sql.Placeholder() * len(columns))
-)
-pitching_data_csv = pitching_data_csv.where(pd.notnull(pitching_data_csv), None)
-data = [tuple(x) for x in pitching_data_csv.to_numpy()]
-cur.executemany(insert_statement, data)
-conn.commit()
+    print('done')
+    raw_batting_data = get_stat_data(endpoints, 'batting')
+    raw_pitching_data = get_stat_data(endpoints, 'pitching')
+    print('done')
 
-# Insert for Batting Data
-table_name = 'batting_data'
-columns = batting_data_csv.columns.tolist()
-insert_statement = sql.SQL("INSERT INTO {} ({}) VALUES ({});").format(
-    sql.Identifier(table_name),
-    sql.SQL(', ').join(map(sql.Identifier, columns)),
-    sql.SQL(', ').join(sql.Placeholder() * len(columns))
-)
-batting_data_csv = batting_data_csv.where(pd.notnull(batting_data_csv), None)
-data = [tuple(x) for x in batting_data_csv.to_numpy()]
-cur.executemany(insert_statement, data)
-conn.commit()
+    pitching_data_csv = clean_csv(raw_pitching_data, 'pitching')
+    pitching_data_csv['upload_dttm'] = previous_date
+    batting_data_csv = clean_csv(raw_batting_data, 'batting')
+    batting_data_csv['upload_dttm'] = previous_date
+    pitching_data_csv.rename(columns={col: col.lower() for col in pitching_data_csv.columns}, inplace=True)
+    batting_data_csv.rename(columns={col: col.lower() for col in batting_data_csv.columns}, inplace=True)
+    batting_data_csv.rename(columns={'wpa+': 'wpaplus', 'wpa-': 'wpaminus'}, inplace=True)
 
-# Close the cursor and connection
-cur.close()
-conn.close()
-print('done')
+    ##insert data
+    conn_params = {
+        'dbname': 'db_init',
+        'user': 'csca5028',
+        'password': 'csca5028',
+        'host': 'csca5028-db-instance.c1a04q2cyd4h.us-east-1.rds.amazonaws.com',
+        'port': '5432'
+    }
+
+    conn = psycopg2.connect(**conn_params)
+    cur = conn.cursor()
+
+    # Insert for Pitching Data
+    table_name = 'pitching_data'
+    columns = pitching_data_csv.columns.tolist()
+    insert_statement = sql.SQL("INSERT INTO {} ({}) VALUES ({});").format(
+        sql.Identifier(table_name),
+        sql.SQL(', ').join(map(sql.Identifier, columns)),
+        sql.SQL(', ').join(sql.Placeholder() * len(columns))
+    )
+    pitching_data_csv = pitching_data_csv.where(pd.notnull(pitching_data_csv), None)
+    data = [tuple(x) for x in pitching_data_csv.to_numpy()]
+    cur.executemany(insert_statement, data)
+    conn.commit()
+
+    # Insert for Batting Data
+    table_name = 'batting_data'
+    columns = batting_data_csv.columns.tolist()
+    insert_statement = sql.SQL("INSERT INTO {} ({}) VALUES ({});").format(
+        sql.Identifier(table_name),
+        sql.SQL(', ').join(map(sql.Identifier, columns)),
+        sql.SQL(', ').join(sql.Placeholder() * len(columns))
+    )
+    batting_data_csv = batting_data_csv.where(pd.notnull(batting_data_csv), None)
+    data = [tuple(x) for x in batting_data_csv.to_numpy()]
+    cur.executemany(insert_statement, data)
+    conn.commit()
+
+    # Close the cursor and connection
+    cur.close()
+    conn.close()
+    print('done')
+
+if __name__ == '__main__':
+    main()
