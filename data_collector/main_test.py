@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 from main import find_endpoints, get_stat_data, clean_csv
 import pandas as pd
+import psycopg2
 
 class TestBaseballScript(unittest.TestCase):
 
@@ -111,6 +112,32 @@ class TestBaseballScript(unittest.TestCase):
 
         self.assertIsInstance(cleaned_batting_data, pd.DataFrame)
         self.assertIsInstance(cleaned_pitching_data, pd.DataFrame)
+
+    def test_database_connection(self):
+        # Define connection parameters
+        conn_params = {
+            'dbname': 'db_init',
+            'user': 'csca5028',
+            'password': 'csca5028',
+            'host': 'csca5028-db-instance.c1a04q2cyd4h.us-east-1.rds.amazonaws.com',
+            'port': '5432'
+        }
+
+        # Attempt to connect to the database
+        try:
+            conn = psycopg2.connect(**conn_params)
+            cursor = conn.cursor()
+
+            # Check if the connection is successful
+            self.assertTrue(conn is not None)
+            self.assertTrue(cursor is not None)
+
+            # Close the cursor and connection
+            cursor.close()
+            conn.close()
+        except psycopg2.Error as e:
+            # If connection fails, fail the test
+            self.fail(f"Database connection failed: {e}")
 
 
 
