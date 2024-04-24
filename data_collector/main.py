@@ -92,7 +92,7 @@ def main():
     current_date = datetime.now()
 
     # Subtract one day from the current date
-    previous_date = current_date - timedelta(days=1)
+    previous_date = current_date - timedelta(days=2)
 
     # Extract year, month, and day from the previous date
     year = previous_date.year
