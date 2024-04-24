@@ -28,7 +28,8 @@ def get_batters():
     conn = psycopg2.connect(**conn_params)
     cur = conn.cursor()
     cur.execute('''SELECT distinct  REVERSE(SUBSTRING(REVERSE(batting), POSITION(' ' IN REVERSE(batting)) + 1)) AS batting
-                    FROM batting_data''')
+                    FROM batting_data
+                order by batting''')
     batters = cur.fetchall()
     cur.close()
     conn.close()
