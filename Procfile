@@ -1,1 +1,1 @@
-web: gunicorn frontend.src.app:app
+web: newrelic-admin run-program gunicorn frontend.src.app:app
